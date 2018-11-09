@@ -11,8 +11,10 @@ python nmt.py \
     --decode_max_time_step 60 \
     --batch_size 32 \
     --model_type ml \
+    --beam_size 1 \
     --log_every 1000 \
-    --save_to mle_update \
+    --save_to mle_model \
+    --save_to_file test_result.txt
     --mode train \
     --valid_niter 4788 \
     --cuda
