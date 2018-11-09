@@ -57,10 +57,10 @@ def init_config():
     parser.add_argument('--save_nbest', default=False, action='store_true', help='save nbest decoding results')
     parser.add_argument('--patience', default=30, type=int, help='training patience')
     parser.add_argument('--uniform_init', default=None, type=float, help='if specified, use uniform initialization for all parameters')
-    parser.add_argument('--clip_grad', default=10., type=float, help='clip gradients')
+    parser.add_argument('--clip_grad', default=100000000., type=float, help='clip gradients')
     parser.add_argument('--max_niter', default=25, type=int, help='maximum number of training iterations')
     parser.add_argument('--lr', default=0.001, type=float, help='learning rate')
-    parser.add_argument('--lr_decay', default=0.5, type=float, help='decay learning rate if the validation performance drops')
+    parser.add_argument('--lr_decay', default=1., type=float, help='decay learning rate if the validation performance drops')
     parser.add_argument('--update_freq', default=1, type=int, help='update freq')
     parser.add_argument('--reward_type', default='bleu', type=str, choices=['bleu', 'f1', 'combined','delta_f1', 'length', 'repeat'])
 
@@ -840,7 +840,6 @@ class NMT(nn.Module):
 
 
     def mrt(self, src_sents, tgt_sents, sample_size=None, to_word=False, reward_type="bleu"):
-
         if not type(src_sents[0]) == list:
             src_sents = [src_sents]
         if not sample_size:

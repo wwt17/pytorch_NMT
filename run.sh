@@ -1,19 +1,44 @@
 #!/usr/bin/env bash
 
 python nmt.py \
-    --train_src ./en-de/train.en-de.low.filt.de \
-    --train_tgt ./en-de/train.en-de.low.filt.en \
-    --dev_src ./en-de/valid.en-de.low.de \
-    --dev_tgt ./en-de/valid.en-de.low.en \
-    --test_src ./en-de/test.en-de.low.de \
-    --test_tgt ./en-de/test.en-de.low.en \
+    --train_src data/iwslt14/train.de \
+    --train_tgt data/iwslt14/train.en \
+    --dev_src data/iwslt14/valid.de \
+    --dev_tgt data/iwslt14/valid.en \
+    --test_src data/iwslt14/test.de \
+    --test_tgt data/iwslt14/test.en \
+    --vocab vocab.bin \
+    --decode_max_time_step 60 \
+    --batch_size 64 \
+    --model_type ml \
+    --dropout 0.2 \
+    --beam_size 5 \
+    --log_every 1000 \
+    --save_to mle_model_for_mixer \
+    --save_to_file test_result.txt \
+    --mode train \
+    --valid_niter 2394 \
+    --cuda
+
+
+python nmt.py \
+    --train_src data/iwslt14/train.de \
+    --train_tgt data/iwslt14/train.en \
+    --dev_src data/iwslt14/valid.de \
+    --dev_tgt data/iwslt14/valid.en \
+    --test_src data/iwslt14/test.de \
+    --test_tgt data/iwslt14/test.en \
     --vocab ./vocab.bin \
+    --batch_size 64 \
+    --beam_size 5 \
+    --dropout 0.2 \
+    --decode_max_time_step 60 \
     --model_type mixer \
-    --sample_size 5 \
+    --valid_niter 2394 \
+    --valid_metric 'bleu' \
+    --log_every 1000 \
+    --save_to mixer_model \
     --reward_type "bleu" \
-    --valid_niter 1000 \
-    --load_model mle.bin \
-    --save_to mle_rl_bleu \
-    --decode_max_time_step 100 \
-    --batch_size 5 \
-    --log_every 5
+    --load_model mle_model_for_mixer.bin \
+    --cuda
+
