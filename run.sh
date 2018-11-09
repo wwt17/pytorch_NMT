@@ -18,6 +18,7 @@ python nmt.py \
     --save_to_file test_result.txt \
     --mode train \
     --valid_niter 2394 \
+    --max_niter 10 \
     --cuda
 
 

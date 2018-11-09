@@ -58,7 +58,7 @@ def init_config():
     parser.add_argument('--patience', default=30, type=int, help='training patience')
     parser.add_argument('--uniform_init', default=None, type=float, help='if specified, use uniform initialization for all parameters')
     parser.add_argument('--clip_grad', default=100000000., type=float, help='clip gradients')
-    parser.add_argument('--max_niter', default=25, type=int, help='maximum number of training iterations')
+    parser.add_argument('--max_niter', default=100, type=int, help='maximum number of training iterations')
     parser.add_argument('--lr', default=0.001, type=float, help='learning rate')
     parser.add_argument('--lr_decay', default=1., type=float, help='decay learning rate if the validation performance drops')
     parser.add_argument('--update_freq', default=1, type=int, help='update freq')
