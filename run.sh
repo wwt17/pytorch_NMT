@@ -13,13 +13,12 @@ python nmt.py \
     --model_type ml \
     --dropout 0.2 \
     --beam_size 5 \
-    --log_every 1000 \
+    --log_every 1 \
     --save_to mle_model_for_mixer \
     --save_to_file test_result.txt \
     --mode train \
     --valid_niter 2394 \
-    --max_nepoch 15 \
-    --cuda
+    --max_nepoch 20
 
 
 python nmt.py \

@@ -231,6 +231,7 @@ class NMT(nn.Module):
         output, _ = pad_packed_sequence(output)
 
         dec_init_cell = self.decoder_cell_init(torch.cat([last_cell[0], last_cell[1]], 1))
+        dec_init_cell = torch.zeros_like(dec_init_cell)
         dec_init_state = F.tanh(dec_init_cell)
 
         return output, (dec_init_state, dec_init_cell)
