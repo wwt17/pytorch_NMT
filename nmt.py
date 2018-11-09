@@ -30,8 +30,8 @@ def init_config():
     parser.add_argument('--mode', choices=['train', 'test', 'sample'], default='train', help='run mode')
     parser.add_argument('--vocab', type=str, help='path of the serialized vocabulary')
     parser.add_argument('--batch_size', default=32, type=int, help='batch size')
-    parser.add_argument('--beam_size', default=5, type=int, help='beam size for beam search')
-    parser.add_argument('--sample_size', default=5, type=int, help='sample size')
+    parser.add_argument('--beam_size', default=1, type=int, help='beam size for beam search')
+    parser.add_argument('--sample_size', default=1, type=int, help='sample size')
     parser.add_argument('--embed_size', default=256, type=int, help='size of word embeddings')
     parser.add_argument('--hidden_size', default=256, type=int, help='size of LSTM hidden states')
     parser.add_argument('--dropout', default=0., type=float, help='dropout rate')
@@ -43,30 +43,30 @@ def init_config():
     parser.add_argument('--test_src', type=str, help='path to the test source file')
     parser.add_argument('--test_tgt', type=str, help='path to the test target file')
 
-    parser.add_argument('--decode_max_time_step', default=200, type=int, help='maximum number of time steps used '
+    parser.add_argument('--decode_max_time_step', default=60, type=int, help='maximum number of time steps used '
                                                                               'in decoding and sampling')
 
     parser.add_argument('--model_type', default='ml', type=str, choices=['ml','rl', 'mixer', 'mrt'])
-    parser.add_argument('--valid_niter', default=10000, type=int, help='every n iterations to perform validation')
+    parser.add_argument('--valid_niter', default=1000, type=int, help='every n iterations to perform validation')
     parser.add_argument('--valid_metric', default='bleu', choices=['bleu', 'ppl', 'word_acc', 'sent_acc'], help='metric used for validation')
     parser.add_argument('--log_every', default=500, type=int, help='every n iterations to log training statistics')
     parser.add_argument('--load_model', default=None, type=str, help='load a pre-trained model')
     parser.add_argument('--save_to', default='model', type=str, help='save trained model to')
-    parser.add_argument('--save_model_after', default=2, help='save the model only after n validation iterations')
-    parser.add_argument('--save_to_file', default=None, type=str, help='if provided, save decoding results to file')
+    parser.add_argument('--save_model_after', default=0, help='save the model only after n validation iterations')
+    parser.add_argument('--save_to_file', default='decode_test.txt', type=str, help='if provided, save decoding results to file')
     parser.add_argument('--save_nbest', default=False, action='store_true', help='save nbest decoding results')
     parser.add_argument('--patience', default=30, type=int, help='training patience')
     parser.add_argument('--uniform_init', default=None, type=float, help='if specified, use uniform initialization for all parameters')
-    parser.add_argument('--clip_grad', default=5., type=float, help='clip gradients')
-    parser.add_argument('--max_niter', default=-1, type=int, help='maximum number of training iterations')
-    parser.add_argument('--lr', default=0.0005, type=float, help='learning rate')
-    parser.add_argument('--lr_decay', default=0.5, type=float, help='decay learning rate if the validation performance drops')
+    parser.add_argument('--clip_grad', default=10., type=float, help='clip gradients')
+    parser.add_argument('--max_niter', default=25, type=int, help='maximum number of training iterations')
+    parser.add_argument('--lr', default=0.2, type=float, help='learning rate')
+    parser.add_argument('--lr_decay', default=1./1.2, type=float, help='decay learning rate if the validation performance drops')
     parser.add_argument('--update_freq', default=1, type=int, help='update freq')
     parser.add_argument('--reward_type', default='bleu', type=str, choices=['bleu', 'f1', 'combined','delta_f1', 'length', 'repeat'])
 
     parser.add_argument('--run_with_no_patience', default=10, type=int, help="If patience hit within these many first epochs, reset patience=0.")
-    parser.add_argument('--delta_steps', default=4, type=int, help='MIXER: annealing steps for using REINFROCE loss')
-    parser.add_argument('--XER', default=2, type=int, help='Every XER epoches, decrease delta by delta.' )
+    parser.add_argument('--delta_steps', default=3, type=int, help='MIXER: annealing steps for using REINFROCE loss')
+    parser.add_argument('--XER', default=5, type=int, help='Every XER epoches, decrease delta by delta.' )
     parser.add_argument('--alpha', default=0.005, type=float, help='alpha value for minimum risk training')
     # raml training
     # parser.add_argument('--temp', default=0.85, type=float, help='temperature in reward distribution')
@@ -1292,7 +1292,7 @@ def train(args):
                     dev_ppl = np.exp(dev_loss)
 
                 if args.valid_metric in ['bleu', 'word_acc', 'sent_acc']:
-                    dev_hyps = decode(model, dev_data)
+                    dev_hyps = decode(model, dev_data, verbose=False)
                     dev_hyps = [hyps[0] for hyps in dev_hyps]
                     if args.valid_metric == 'bleu':
                         valid_metric = get_bleu([tgt for src, tgt in dev_data], dev_hyps)
@@ -1300,6 +1300,8 @@ def train(args):
                         valid_metric = get_acc([tgt for src, tgt in dev_data], dev_hyps, acc_type=args.valid_metric)
                     print('validation: iter %d, dev. ppl %f, dev. %s %f' % (train_iter, dev_ppl, args.valid_metric, valid_metric),
                           file=sys.stderr)
+
+                    test(args)
                 else:
 
                     valid_metric = -dev_ppl

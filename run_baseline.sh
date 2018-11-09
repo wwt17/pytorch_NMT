@@ -8,13 +8,13 @@ python nmt.py \
     --test_src data/iwslt14/test.de \
     --test_tgt data/iwslt14/test.en \
     --vocab vocab.bin \
-    --decode_max_time_step 200 \
-    --batch_size 64 \
+    --decode_max_time_step 60 \
+    --batch_size 32 \
     --model_type ml \
-    --log_every 100 \
+    --log_every 1000 \
     --save_to mle_update \
     --mode train \
-    --valid_niter 2394 \
+    --valid_niter 4788 \
     --cuda
 
 #load_model_name=mle_update
