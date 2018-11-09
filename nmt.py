@@ -58,7 +58,7 @@ def init_config():
     parser.add_argument('--patience', default=30, type=int, help='training patience')
     parser.add_argument('--uniform_init', default=None, type=float, help='if specified, use uniform initialization for all parameters')
     parser.add_argument('--clip_grad', default=100000000., type=float, help='clip gradients')
-    parser.add_argument('--max_niter', default=100, type=int, help='maximum number of training iterations')
+    parser.add_argument('--max_nepoch', default=100, type=int, help='maximum number of training iterations')
     parser.add_argument('--lr', default=0.001, type=float, help='learning rate')
     parser.add_argument('--lr_decay', default=1., type=float, help='decay learning rate if the validation performance drops')
     parser.add_argument('--update_freq', default=1, type=int, help='update freq')
@@ -1165,8 +1165,12 @@ def train(args):
     dev_data_src = read_corpus(args.dev_src, source='src')
     dev_data_tgt = read_corpus(args.dev_tgt, source='tgt')
 
+    test_data_src = read_corpus(args.test_src, source='src')
+    test_data_tgt = read_corpus(args.test_tgt, source='tgt')
+
     train_data = zip(train_data_src, train_data_tgt)
     dev_data = zip(dev_data_src, dev_data_tgt)
+    test_data = zip(test_data_src, test_data_tgt)
 
     vocab, model, optimizer, nll_loss, cross_entropy_loss = init_training(args)
 
@@ -1184,6 +1188,9 @@ def train(args):
     optimizer.zero_grad()
     while True:
         epoch += 1
+        if epoch > args.max_nepoch:
+            print('max_nepoch reached.')
+            break
         for src_sents, tgt_sents in data_iter(train_data, batch_size=args.batch_size):
             train_iter += 1
 
@@ -1300,7 +1307,18 @@ def train(args):
                     print('validation: iter %d, dev. ppl %f, dev. %s %f' % (train_iter, dev_ppl, args.valid_metric, valid_metric),
                           file=sys.stderr)
 
-                    test(args)
+                    hypotheses = decode(model, test_data, False)
+                    top_hypotheses = [hyps[0] for hyps in hypotheses]
+
+                    bleu_score = get_bleu([tgt for src, tgt in test_data], top_hypotheses)
+                    word_acc = get_acc([tgt for src, tgt in test_data], top_hypotheses, 'word_acc')
+                    sent_acc = get_acc([tgt for src, tgt in test_data], top_hypotheses, 'sent_acc')
+                    f1_acc = get_acc([tgt for src, tgt in test_data], top_hypotheses, 'f1')
+                    print('=' * 100)
+                    print('Corpus Level BLEU: %f, word level acc: %f, sentence level acc: %f, f1 acc: %f' % (
+                        bleu_score, word_acc, sent_acc, f1_acc), file=sys.stderr)
+                    print('=' * 100)
+
                 else:
 
                     valid_metric = -dev_ppl
