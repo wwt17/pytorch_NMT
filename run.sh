@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 python nmt.py \
     --train_src ./en-de/train.en-de.low.filt.de \
     --train_tgt ./en-de/train.en-de.low.filt.en \
