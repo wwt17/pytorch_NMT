@@ -59,8 +59,8 @@ def init_config():
     parser.add_argument('--uniform_init', default=None, type=float, help='if specified, use uniform initialization for all parameters')
     parser.add_argument('--clip_grad', default=10., type=float, help='clip gradients')
     parser.add_argument('--max_niter', default=25, type=int, help='maximum number of training iterations')
-    parser.add_argument('--lr', default=0.2, type=float, help='learning rate')
-    parser.add_argument('--lr_decay', default=1./1.2, type=float, help='decay learning rate if the validation performance drops')
+    parser.add_argument('--lr', default=0.001, type=float, help='learning rate')
+    parser.add_argument('--lr_decay', default=0.5, type=float, help='decay learning rate if the validation performance drops')
     parser.add_argument('--update_freq', default=1, type=int, help='update freq')
     parser.add_argument('--reward_type', default='bleu', type=str, choices=['bleu', 'f1', 'combined','delta_f1', 'length', 'repeat'])
 
