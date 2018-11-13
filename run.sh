@@ -42,6 +42,7 @@ python nmt.py \
     --valid_niter ${valid_niter} \
     --save_to mle_model \
     --save_to_file mle_test_result.txt \
+    --load_model mle_model.bin \
     --max_nepoch 20 \
 	--cuda
 
@@ -57,5 +58,5 @@ python nmt.py \
     --valid_niter ${valid_niter} \
     --save_to mixer_model \
     --save_to_file mixer_test_result.txt \
-    --load_model mle_model_for_mixer.bin \
+    --load_model mle_model.bin \
     --cuda
