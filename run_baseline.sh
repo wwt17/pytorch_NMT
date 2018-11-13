@@ -8,13 +8,13 @@ python nmt.py \
     --test_src data/iwslt14/test.de \
     --test_tgt data/iwslt14/test.en \
     --vocab vocab.bin \
-    --decode_max_time_step 60 \
-    --batch_size 32 \
+    --decode_max_time_step 50 \
+    --batch_size 80 \
     --model_type ml \
     --beam_size 1 \
     --log_every 1000 \
     --save_to mle_model \
-    --save_to_file test_result.txt
+    --save_to_file test_result.txt \
     --mode train \
     --valid_niter 4788 \
     --cuda

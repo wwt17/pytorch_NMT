@@ -251,7 +251,7 @@ class NMT(nn.Module):
         batch_size = src_encoding.size(1)
 
         # (batch_size, src_sent_len, hidden_size)
-        src_encoding = src_encoding.t()
+        src_encoding = src_encoding.transpose(0, 1)
         # (batch_size, src_sent_len, hidden_size)
         src_encoding_att_linear = tensor_transform(self.att_src_linear, src_encoding)
         # initialize attentional vector
@@ -339,7 +339,7 @@ class NMT(nn.Module):
             h_t, cell_t = self.decoder_lstm(x, hidden)
             h_t = self.dropout(h_t)
 
-            ctx_t, alpha_t = self.dot_prod_attention(h_t, expanded_src_encoding.t(), expanded_src_encoding_att_linear.t())
+            ctx_t, alpha_t = self.dot_prod_attention(h_t, expanded_src_encoding.transpose(0, 1), expanded_src_encoding_att_linear.transpose(0, 1))
 
             att_t = F.tanh(self.att_vec_linear(torch.cat([h_t, ctx_t], 1)))
             att_t = self.dropout(att_t)
@@ -414,7 +414,7 @@ class NMT(nn.Module):
         batch_size = src_encoding.size(1)
 
         # (batch_size, src_sent_len, hidden_size)
-        src_encoding = src_encoding.t()
+        src_encoding = src_encoding.transpose(0, 1)
         src_encoding_att_linear = tensor_transform(self.att_src_linear, src_encoding)
         # initialize attentional vector
         att_tm1 = Variable(new_tensor(batch_size, self.args.hidden_size).zero_(), requires_grad=False)
@@ -647,8 +647,8 @@ class NMT(nn.Module):
         dec_init_cell = dec_init_cell.repeat(sample_size, 1)
 
         src_encoding_att_linear = tensor_transform(self.att_src_linear, src_encoding)
-        src_encoding = src_encoding.t()
-        src_encoding_att_linear = src_encoding_att_linear.t()
+        src_encoding = src_encoding.transpose(0, 1)
+        src_encoding_att_linear = src_encoding_att_linear.transpose(0, 1)
 
         hidden = (dec_init_state, dec_init_cell)
         new_tensor = dec_init_state.data.new
@@ -871,8 +871,8 @@ class NMT(nn.Module):
         dec_init_cell = dec_init_cell.repeat(sample_size, 1)
 
         src_encoding_att_linear = tensor_transform(self.att_src_linear, src_encoding)
-        src_encoding = src_encoding.t()
-        src_encoding_att_linear = src_encoding_att_linear.t()
+        src_encoding = src_encoding.transpose(0, 1)
+        src_encoding_att_linear = src_encoding_att_linear.transpose(0, 1)
 
         hidden = (dec_init_state, dec_init_cell)
         new_tensor = dec_init_state.data.new
@@ -1027,7 +1027,7 @@ class NMT(nn.Module):
             new_rewards[s].append(1.0)
             new_sent_probs[s].append(gt_probs_sents[s])
             new_sent_probs_t = torch.stack(new_sent_probs[s]) * args.alpha
-            new_sent_probs_norm = torch.nn.functional.softmax(new_sent_probs_t.t())
+            new_sent_probs_norm = torch.nn.functional.softmax(new_sent_probs_t.transpose(0, 1))
             new_rewards_t = Variable(torch.FloatTensor(new_rewards[s]), requires_grad=False)
             if args.cuda:
                 new_rewards_t = new_rewards_t.cuda()
